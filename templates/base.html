@@ -10,35 +10,20 @@
 <body>
 
 {% if user.is_authenticated %}
+  <div class="app-layout">
+    {% include "partials/sidebar.html" %}
+    <div class="main-area">
+      {% include "partials/navbar.html" %}
+      {% include "partials/alerts.html" %}
+      <main class="page-content">
+{% endif %}
 
-<div class="app-layout">
+        {% block content %}{% endblock %}
 
-  <!-- ── SIDEBAR ── -->
-  {% include "partials/sidebar.html" %}
-
-  <!-- ── MAIN AREA ── -->
-  <div class="main-area">
-
-    <!-- ── TOPBAR ── -->
-    {% include "partials/navbar.html" %}
-
-    <!-- ── ALERTS ── -->
-    {% include "partials/alerts.html" %}
-
-    <!-- ── PAGE CONTENT ── -->
-    <main class="page-content">
-      {% block content %}{% endblock %}
-    </main>
-
+{% if user.is_authenticated %}
+      </main>
+    </div>
   </div>
-
-</div>
-
-{% else %}
-
-<!-- Unauthenticated pages (login/signup) get plain layout -->
-{% block content %}{% endblock %}
-
 {% endif %}
 
 <script src="{% static 'js/main.js' %}"></script>
