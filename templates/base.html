@@ -1,0 +1,36 @@
+<<<<<<< Updated upstream
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}CoreInventory{% endblock %}</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/main.css' %}"/>
+</head>
+<body>
+
+{% if user.is_authenticated %}
+  <div class="app-layout">
+    {% include "partials/sidebar.html" %}
+    <div class="main-area">
+      {% include "partials/navbar.html" %}
+      {% include "partials/alerts.html" %}
+      <main class="page-content">
+{% endif %}
+
+        {% block content %}{% endblock %}
+
+{% if user.is_authenticated %}
+      </main>
+    </div>
+  </div>
+{% else %}
+  </main>
+{% endif %}
+
+<script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>
+>>>>>>> Stashed changes
