@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}Products — CoreInventory{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <div class="page-title">Products</div>
+  <a href="{% url 'products:create' %}" class="btn btn-primary">+ New Product</a>
+</div>
+
+<!-- Search + Filter Bar -->
+<div style="display:flex; gap:10px; margin-bottom:16px; align-items:center;">
+  <form method="GET" style="display:flex; gap:10px; flex:1;">
+    <input
+      type="text"
+      name="q"
+      value="{{ request.GET.q }}"
+      placeholder="Search by name or SKU..."
+      class="form-input"
+      style="max-width:280px;"
+    />
+    <select name="filter" class="form-input" style="max-width:160px;">
+      <option value="">All Products</option>
+      <option value="low_stock"
+        {% if request.GET.filter == 'low_stock' %}selected{% endif %}>
+        Low Stock
+      </option>
+      <option value="out_of_stock"
+        {% if request.GET.filter == 'out_of_stock' %}selected{% endif %}>
+        Out of Stock
+      </option>
+    </select>
+    <button type="submit" class="btn btn-primary">Search</button>
+    {% if request.GET.q or request.GET.filter %}
+      <a href="{% url 'products:list' %}" class="btn">Clear</a>
+    {% endif %}
+  </form>
+</div>
+
+<!-- Products Table -->
+<div class="table-card">
+  <div class="table-card-header">
+    <span>
+      {{ products.count }} product{{ products.count|pluralize }}
+    </span>
+  </div>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>SKU</th>
+        <th>Category</th>
+        <th>Unit</th>
+        <th>Cost Price</th>
+        <th>On Hand</th>
+        <th>Status</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for product in products %}
+      <tr>
+        <td style="font-weight:500;">{{ product.name }}</td>
+        <td class="ref-code">{{ product.sku }}</td>
+        <td style="color:var(--muted); font-size:12px;">
+          {{ product.category.name|default:"—" }}
+        </td>
+        <td style="color:var(--muted); font-size:12px;">
+          {{ product.get_unit_of_measure_display }}
+        </td>
+        <td>₹{{ product.cost_price }}</td>
+        <td>
+          <span style="font-weight:500;
+            {% if product.is_out_of_stock %}color:var(--danger);
+            {% elif product.is_low_stock %}color:var(--warning);
+            {% else %}color:var(--success);{% endif %}">
+            {{ product.current_stock }}
+          </span>
+          <span style="font-size:11px; color:var(--muted);">
+            {{ product.get_unit_of_measure_display }}
+          </span>
+        </td>
+        <td>
+          {% if product.is_out_of_stock %}
+            <span class="badge badge-cancel">Out of Stock</span>
+          {% elif product.is_low_stock %}
+            <span class="badge badge-waiting">Low Stock</span>
+          {% else %}
+            <span class="badge badge-done">In Stock</span>
+          {% endif %}
+        </td>
+        <td>
+          <a href="{% url 'products:detail' product.pk %}"
+             class="btn btn-sm">View</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="8"
+            style="text-align:center; color:var(--muted); padding:32px;">
+          No products found.
+          <a href="{% url 'products:create' %}"
+             style="color:var(--primary);">
+            Add your first product →
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

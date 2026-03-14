@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — CoreInventory{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <div class="page-title">Dashboard</div>
+    <div style="font-size:12px; color:var(--muted); margin-top:2px;">
+      Welcome back, {{ request.user.username }}
+    </div>
+  </div>
+  <div style="display:flex; gap:8px;">
+    <a href="{% url 'operations:receipt_create' %}" class="btn btn-primary">
+      + New Receipt
+    </a>
+    <a href="{% url 'operations:delivery_create' %}" class="btn">
+      + New Delivery
+    </a>
+  </div>
+</div>
+
+<!-- KPI Cards -->
+<div class="kpi-grid">
+  <div class="kpi-card kpi-blue">
+    <div class="kpi-label">Total Products</div>
+    <div class="kpi-value">{{ total_products }}</div>
+    <div class="kpi-sub">active in system</div>
+  </div>
+  <div class="kpi-card kpi-warn">
+    <div class="kpi-label">Low Stock Items</div>
+    <div class="kpi-value">{{ low_stock_items }}</div>
+    <div class="kpi-sub">need reorder</div>
+  </div>
+  <div class="kpi-card kpi-danger">
+    <div class="kpi-label">Out of Stock</div>
+    <div class="kpi-value">{{ out_of_stock }}</div>
+    <div class="kpi-sub">immediate action needed</div>
+  </div>
+  <div class="kpi-card kpi-green">
+    <div class="kpi-label">Pending Receipts</div>
+    <div class="kpi-value">{{ pending_receipts }}</div>
+    <div class="kpi-sub">awaiting validation</div>
+  </div>
+  <div class="kpi-card kpi-blue">
+    <div class="kpi-label">Pending Deliveries</div>
+    <div class="kpi-value">{{ pending_deliveries }}</div>
+    <div class="kpi-sub">awaiting dispatch</div>
+  </div>
+</div>
+
+<!-- Low stock alert banner -->
+{% if low_stock_items %}
+<div class="alert alert-warning" style="margin-bottom:20px;">
+  <span>⚠</span>
+  <span>
+    <strong>{{ low_stock_items }} product{{ low_stock_items|pluralize }}</strong>
+    are running low on stock.
+    <a href="{% url 'products:list' %}?filter=low_stock"
+       style="color:inherit; font-weight:500; margin-left:6px;">
+      View products →
+    </a>
+  </span>
+</div>
+{% endif %}
+
+<!-- Recent Operations -->
+<div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+
+  <!-- Recent Receipts -->
+  <div class="table-card">
+    <div class="table-card-header">
+      <span>Recent Receipts</span>
+      <a href="{% url 'operations:receipt_list' %}"
+         style="font-size:12px; color:var(--primary); text-decoration:none;">
+        View all
+      </a>
+    </div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Reference</th>
+          <th>Supplier</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for receipt in recent_receipts %}
+        <tr>
+          <td>
+            <a href="{% url 'operations:receipt_detail' receipt.pk %}"
+               class="ref-code"
+               style="color:var(--primary); text-decoration:none;">
+              {{ receipt.reference }}
+            </a>
+          </td>
+          <td style="color:var(--muted); font-size:12px;">
+            {{ receipt.supplier|default:"—" }}
+          </td>
+          <td>
+            <span class="badge badge-{{ receipt.status }}">
+              {{ receipt.get_status_display }}
+            </span>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="3"
+              style="text-align:center; color:var(--muted); padding:20px;">
+            No receipts yet
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Recent Deliveries -->
+  <div class="table-card">
+    <div class="table-card-header">
+      <span>Recent Deliveries</span>
+      <a href="{% url 'operations:delivery_list' %}"
+         style="font-size:12px; color:var(--primary); text-decoration:none;">
+        View all
+      </a>
+    </div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Reference</th>
+          <th>Address</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for delivery in recent_deliveries %}
+        <tr>
+          <td>
+            <a href="{% url 'operations:delivery_detail' delivery.pk %}"
+               class="ref-code"
+               style="color:var(--primary); text-decoration:none;">
+              {{ delivery.reference }}
+            </a>
+          </td>
+          <td style="color:var(--muted); font-size:12px;">
+            {{ delivery.delivery_address|default:"—"|truncatechars:20 }}
+          </td>
+          <td>
+            <span class="badge badge-{{ delivery.status }}">
+              {{ delivery.get_status_display }}
+            </span>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="3"
+              style="text-align:center; color:var(--muted); padding:20px;">
+            No deliveries yet
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+{% endblock %}
