@@ -46,3 +46,7 @@ def logout_view(request):
     logout(request)
     messages.info(request, 'You have been logged out.')
     return redirect('accounts:login')
+
+@login_required
+def profile_view(request):
+    return render(request, 'accounts/profile.html')

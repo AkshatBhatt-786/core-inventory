@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}New Adjustment — CoreInventory{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <div class="page-title">New Stock Adjustment</div>
+    <div style="font-size:12px;color:var(--muted);margin-top:2px;">
+      <a href="{% url 'operations:adjustment_list' %}"
+         style="color:var(--muted);text-decoration:none;">Adjustments</a> / Create
+    </div>
+  </div>
+</div>
+
+<div style="max-width:520px;">
+  <div class="table-card" style="padding:24px;">
+
+    <div class="alert alert-warning" style="margin-bottom:20px;">
+      <span>⚠</span>
+      <span>This will immediately update stock to your counted quantity
+            and log the change in the ledger.</span>
+    </div>
+
+    <form method="POST" novalidate>
+      {% csrf_token %}
+      <div style="display:flex;flex-direction:column;gap:16px;">
+
+        <div class="form-group">
+          <label class="form-label">Product *</label>
+          <select name="product" class="form-input" id="product-select"
+                  onchange="updateCurrentStock(this)">
+            <option value="">— Select Product —</option>
+            {% for p in products %}
+              <option value="{{ p.pk }}" data-stock="{{ p.current_stock }}">
+                {{ p.name }} ({{ p.sku }}) — Current: {{ p.current_stock }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Current Stock (System)</label>
+          <input type="text" id="current-stock-display" class="form-input"
+                 value="—" disabled
+                 style="background:var(--page-bg);color:var(--muted);"/>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Physical Count (Counted Qty) *</label>
+          <input type="number" name="counted_qty" class="form-input"
+                 placeholder="What you physically counted" min="0" required/>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Location</label>
+          <select name="location" class="form-input">
+            <option value="">— Select Location (optional) —</option>
+            {% for loc in locations %}
+              <option value="{{ loc.pk }}">
+                {{ loc.warehouse.short_code }}/{{ loc.short_code }} — {{ loc.name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Reason *</label>
+          <select name="reason" class="form-input">
+            <option value="damaged">Damaged</option>
+            <option value="lost">Lost</option>
+            <option value="found">Found</option>
+            <option value="correction" selected>Correction</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Notes</label>
+          <textarea name="notes" class="form-input" rows="2"
+                    placeholder="Optional notes"></textarea>
+        </div>
+
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:24px;
+                  padding-top:20px;border-top:0.5px solid var(--border);">
+        <button type="submit" class="btn btn-primary">Apply Adjustment</button>
+        <a href="{% url 'operations:adjustment_list' %}" class="btn">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function updateCurrentStock(select) {
+  const opt = select.options[select.selectedIndex];
+  const stock = opt.dataset.stock;
+  document.getElementById('current-stock-display').value =
+    stock !== undefined ? stock : '—';
+}
+</script>
+
+{% endblock %}

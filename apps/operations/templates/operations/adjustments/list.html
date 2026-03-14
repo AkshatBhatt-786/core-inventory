@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Adjustments — CoreInventory{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <div class="page-title">Stock Adjustments</div>
+  <a href="{% url 'operations:adjustment_create' %}"
+     class="btn btn-primary">
+    + New Adjustment
+  </a>
+</div>
+
+<div class="table-card">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Reference</th>
+        <th>Product</th>
+        <th>Previous Qty</th>
+        <th>Counted Qty</th>
+        <th>Difference</th>
+        <th>Reason</th>
+        <th>Date</th>
+        <th>By</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for adj in adjustments %}
+      <tr>
+        <td class="ref-code">{{ adj.reference }}</td>
+        <td style="font-weight:500;">{{ adj.product.name }}</td>
+        <td style="color:var(--muted);">{{ adj.previous_qty }}</td>
+        <td style="font-weight:500;">{{ adj.counted_qty }}</td>
+        <td style="font-weight:500;
+          {% if adj.difference > 0 %}color:var(--success);
+          {% elif adj.difference < 0 %}color:var(--danger);
+          {% else %}color:var(--muted);{% endif %}">
+          {% if adj.difference > 0 %}+{% endif %}
+          {{ adj.difference }}
+        </td>
+        <td>
+          <span class="badge badge-draft">
+            {{ adj.get_reason_display }}
+          </span>
+        </td>
+        <td style="font-size:12px; color:var(--muted);">
+          {{ adj.created_at|date:"d M Y" }}
+        </td>
+        <td style="font-size:12px; color:var(--muted);">
+          {{ adj.responsible.username|default:"—" }}
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="8"
+            style="text-align:center; color:var(--muted); padding:32px;">
+          No adjustments yet.
+          <a href="{% url 'operations:adjustment_create' %}"
+             style="color:var(--primary);">
+            Create your first adjustment →
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

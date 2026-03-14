@@ -1,3 +1,8 @@
 from django.urls import path
+from . import views
 
-urlpatterns = []
+app_name = 'ledger'
+
+urlpatterns = [
+    path('', views.history, name='history'),
+]

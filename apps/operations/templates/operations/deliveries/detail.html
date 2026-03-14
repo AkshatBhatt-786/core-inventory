@@ -1,32 +1,30 @@
 {% extends "base.html" %}
-{% block title %}{{ receipt.reference }} — CoreInventory{% endblock %}
+{% block title %}{{ delivery.reference }} — CoreInventory{% endblock %}
 
 {% block content %}
 
 <div class="page-header">
   <div>
-    <div class="page-title">{{ receipt.reference }}</div>
+    <div class="page-title">{{ delivery.reference }}</div>
     <div style="font-size:12px; color:var(--muted); margin-top:2px;">
-      <a href="{% url 'operations:receipt_list' %}"
+      <a href="{% url 'operations:delivery_list' %}"
          style="color:var(--muted); text-decoration:none;">
-        Receipts
-      </a> / {{ receipt.reference }}
+        Deliveries
+      </a> / {{ delivery.reference }}
     </div>
   </div>
   <div style="display:flex; gap:8px; align-items:center;">
-    <span class="badge badge-{{ receipt.status }}">
-      {{ receipt.get_status_display }}
+    <span class="badge badge-{{ delivery.status }}">
+      {{ delivery.get_status_display }}
     </span>
-    {% if receipt.status != 'done' and receipt.status != 'cancel' %}
+    {% if delivery.status != 'done' and delivery.status != 'cancel' %}
       <form method="POST"
-            action="{% url 'operations:receipt_validate' receipt.pk %}">
+            action="{% url 'operations:delivery_validate' delivery.pk %}">
         {% csrf_token %}
-        <button type="submit" class="btn btn-primary">
-          Validate
-        </button>
+        <button type="submit" class="btn btn-primary">Validate</button>
       </form>
       <form method="POST"
-            action="{% url 'operations:receipt_cancel' receipt.pk %}">
+            action="{% url 'operations:delivery_cancel' delivery.pk %}">
         {% csrf_token %}
         <button type="submit" class="btn btn-danger">Cancel</button>
       </form>
@@ -34,41 +32,40 @@
   </div>
 </div>
 
-<!-- Receipt Info -->
-<div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;
-            margin-bottom:16px;">
+<div style="display:grid; grid-template-columns:1fr 1fr;
+            gap:16px; margin-bottom:16px;">
 
   <div class="table-card" style="padding:20px;">
     <div style="font-size:13px; font-weight:500;
                 margin-bottom:12px; color:var(--muted);">
-      Receipt Info
+      Delivery Info
     </div>
     <table style="width:100%; font-size:13px; border-collapse:collapse;">
       <tr>
-        <td style="padding:7px 0; color:var(--muted); width:130px;">
+        <td style="padding:7px 0; color:var(--muted); width:140px;">
           Reference
         </td>
-        <td class="ref-code">{{ receipt.reference }}</td>
+        <td class="ref-code">{{ delivery.reference }}</td>
       </tr>
       <tr>
-        <td style="padding:7px 0; color:var(--muted);">Supplier</td>
-        <td>{{ receipt.supplier|default:"—" }}</td>
-      </tr>
-      <tr>
-        <td style="padding:7px 0; color:var(--muted);">Receive From</td>
-        <td>{{ receipt.receive_from|default:"—" }}</td>
+        <td style="padding:7px 0; color:var(--muted);">Address</td>
+        <td>{{ delivery.delivery_address|default:"—" }}</td>
       </tr>
       <tr>
         <td style="padding:7px 0; color:var(--muted);">Schedule Date</td>
-        <td>{{ receipt.schedule_date|date:"d M Y"|default:"—" }}</td>
+        <td>{{ delivery.schedule_date|date:"d M Y"|default:"—" }}</td>
+      </tr>
+      <tr>
+        <td style="padding:7px 0; color:var(--muted);">Operation Type</td>
+        <td>{{ delivery.operation_type|default:"—" }}</td>
       </tr>
       <tr>
         <td style="padding:7px 0; color:var(--muted);">Responsible</td>
-        <td>{{ receipt.responsible.username|default:"—" }}</td>
+        <td>{{ delivery.responsible.username|default:"—" }}</td>
       </tr>
       <tr>
         <td style="padding:7px 0; color:var(--muted);">Warehouse</td>
-        <td>{{ receipt.warehouse|default:"—" }}</td>
+        <td>{{ delivery.warehouse|default:"—" }}</td>
       </tr>
     </table>
   </div>
@@ -78,11 +75,12 @@
                 margin-bottom:12px; color:var(--muted);">
       Status Flow
     </div>
-    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+    <div style="display:flex; align-items:center;
+                gap:8px; flex-wrap:wrap;">
 
       <span style="padding:6px 14px; border-radius:20px;
         font-size:12px; font-weight:500;
-        {% if receipt.status == 'draft' %}
+        {% if delivery.status == 'draft' %}
           background:var(--primary); color:#fff;
         {% else %}
           background:var(--page-bg); color:var(--muted);
@@ -94,7 +92,19 @@
 
       <span style="padding:6px 14px; border-radius:20px;
         font-size:12px; font-weight:500;
-        {% if receipt.status == 'ready' %}
+        {% if delivery.status == 'waiting' %}
+          background:var(--primary); color:#fff;
+        {% else %}
+          background:var(--page-bg); color:var(--muted);
+        {% endif %}">
+        Waiting
+      </span>
+
+      <span style="color:var(--muted);">→</span>
+
+      <span style="padding:6px 14px; border-radius:20px;
+        font-size:12px; font-weight:500;
+        {% if delivery.status == 'ready' %}
           background:var(--primary); color:#fff;
         {% else %}
           background:var(--page-bg); color:var(--muted);
@@ -106,7 +116,7 @@
 
       <span style="padding:6px 14px; border-radius:20px;
         font-size:12px; font-weight:500;
-        {% if receipt.status == 'done' %}
+        {% if delivery.status == 'done' %}
           background:var(--primary); color:#fff;
         {% else %}
           background:var(--page-bg); color:var(--muted);
@@ -114,7 +124,7 @@
         Done
       </span>
 
-      {% if receipt.status == 'cancel' %}
+      {% if delivery.status == 'cancel' %}
         <span style="color:var(--muted);">→</span>
         <span style="padding:6px 14px; border-radius:20px;
           font-size:12px; font-weight:500;
@@ -125,16 +135,15 @@
 
     </div>
 
-    {% if receipt.notes %}
+    {% if delivery.notes %}
     <div style="margin-top:16px; font-size:13px; color:var(--muted);">
-      <strong>Notes:</strong> {{ receipt.notes }}
+      <strong>Notes:</strong> {{ delivery.notes }}
     </div>
     {% endif %}
   </div>
 
 </div>
 
-<!-- Products Table -->
 <div class="table-card">
   <div class="table-card-header">Products</div>
   <table class="data-table">
@@ -144,23 +153,30 @@
         <th>SKU</th>
         <th>Quantity</th>
         <th>Unit</th>
+        <th>Current Stock</th>
       </tr>
     </thead>
     <tbody>
-      {% for item in receipt.items.all %}
+      {% for item in delivery.items.all %}
       <tr>
         <td style="font-weight:500;">{{ item.product.name }}</td>
         <td class="ref-code">{{ item.product.sku }}</td>
-        <td style="font-weight:500; color:var(--success);">
-          +{{ item.quantity }}
+        <td style="font-weight:500; color:var(--danger);">
+          −{{ item.quantity }}
         </td>
         <td style="color:var(--muted); font-size:12px;">
           {{ item.product.get_unit_of_measure_display }}
         </td>
+        <td style="font-weight:500;
+          {% if item.product.is_out_of_stock %}color:var(--danger);
+          {% elif item.product.is_low_stock %}color:var(--warning);
+          {% else %}color:var(--success);{% endif %}">
+          {{ item.product.current_stock }}
+        </td>
       </tr>
       {% empty %}
       <tr>
-        <td colspan="4"
+        <td colspan="5"
             style="text-align:center; color:var(--muted); padding:20px;">
           No products added
         </td>
@@ -170,4 +186,4 @@
   </table>
 </div>
 
-{% endblock %}
+{% endblock %}  

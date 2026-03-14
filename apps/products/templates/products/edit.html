@@ -1,12 +1,14 @@
 {% extends "base.html" %}
-{% block title %}New Product — CoreInventory{% endblock %}
+{% block title %}Edit {{ product.name }} — CoreInventory{% endblock %}
 {% block content %}
 
 <div class="page-header">
   <div>
-    <div class="page-title">New Product</div>
+    <div class="page-title">Edit Product</div>
     <div style="font-size:12px;color:var(--muted);margin-top:2px;">
-      <a href="{% url 'products:list' %}" style="color:var(--muted);text-decoration:none;">Products</a> / Create
+      <a href="{% url 'products:list' %}" style="color:var(--muted);text-decoration:none;">Products</a>
+      / <a href="{% url 'products:detail' product.pk %}" style="color:var(--muted);text-decoration:none;">{{ product.name }}</a>
+      / Edit
     </div>
   </div>
 </div>
@@ -20,13 +22,15 @@
         <div class="form-group" style="grid-column:1/-1;">
           <label class="form-label">Product Name *</label>
           <input type="text" name="name" class="form-input"
-                 placeholder="e.g. Steel Rods" required/>
+                 value="{{ product.name }}" required/>
         </div>
 
         <div class="form-group">
-          <label class="form-label">SKU / Code *</label>
-          <input type="text" name="sku" class="form-input"
-                 placeholder="e.g. SKU-0001" required/>
+          <label class="form-label">SKU</label>
+          <input type="text" class="form-input"
+                 value="{{ product.sku }}" disabled
+                 style="background:var(--page-bg);color:var(--muted);"/>
+          <span class="form-hint">SKU cannot be changed</span>
         </div>
 
         <div class="form-group">
@@ -34,7 +38,10 @@
           <select name="category" class="form-input">
             <option value="">— Select Category —</option>
             {% for cat in categories %}
-              <option value="{{ cat.pk }}">{{ cat.name }}</option>
+              <option value="{{ cat.pk }}"
+                {% if product.category_id == cat.pk %}selected{% endif %}>
+                {{ cat.name }}
+              </option>
             {% endfor %}
           </select>
         </div>
@@ -42,34 +49,25 @@
         <div class="form-group">
           <label class="form-label">Unit of Measure</label>
           <select name="unit_of_measure" class="form-input">
-            <option value="pcs">Pieces</option>
-            <option value="kg">Kilograms</option>
-            <option value="g">Grams</option>
-            <option value="l">Litres</option>
-            <option value="ml">Millilitres</option>
-            <option value="m">Metres</option>
-            <option value="box">Box</option>
-            <option value="pack">Pack</option>
+            {% for val, label in product.UNIT_CHOICES %}
+              <option value="{{ val }}"
+                {% if product.unit_of_measure == val %}selected{% endif %}>
+                {{ label }}
+              </option>
+            {% endfor %}
           </select>
         </div>
 
         <div class="form-group">
           <label class="form-label">Cost Price (₹)</label>
           <input type="number" name="cost_price" class="form-input"
-                 placeholder="0.00" step="0.01" min="0"/>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Initial Stock</label>
-          <input type="number" name="initial_stock" class="form-input"
-                 placeholder="0" min="0"/>
+                 value="{{ product.cost_price }}" step="0.01" min="0"/>
         </div>
 
         <div class="form-group">
           <label class="form-label">Reorder Level</label>
           <input type="number" name="reorder_level" class="form-input"
-                 placeholder="0" min="0"/>
-          <span class="form-hint">Alert when stock falls below this</span>
+                 value="{{ product.reorder_level }}" min="0"/>
         </div>
 
         <div class="form-group">
@@ -77,7 +75,10 @@
           <select name="warehouse" class="form-input">
             <option value="">— Select Warehouse —</option>
             {% for wh in warehouses %}
-              <option value="{{ wh.pk }}">{{ wh.name }}</option>
+              <option value="{{ wh.pk }}"
+                {% if product.warehouse_id == wh.pk %}selected{% endif %}>
+                {{ wh.name }}
+              </option>
             {% endfor %}
           </select>
         </div>
@@ -85,8 +86,8 @@
       </div>
       <div style="display:flex;gap:10px;margin-top:24px;
                   padding-top:20px;border-top:0.5px solid var(--border);">
-        <button type="submit" class="btn btn-primary">Save Product</button>
-        <a href="{% url 'products:list' %}" class="btn">Cancel</a>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a href="{% url 'products:detail' product.pk %}" class="btn">Cancel</a>
       </div>
     </form>
   </div>

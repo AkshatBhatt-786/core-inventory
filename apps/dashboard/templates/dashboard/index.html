@@ -3,14 +3,15 @@
 
 {% block content %}
 
+<!-- Header -->
 <div class="page-header">
   <div>
     <div class="page-title">Dashboard</div>
-    <div style="font-size:12px; color:var(--muted); margin-top:2px;">
-      Welcome back, {{ request.user.username }}
+    <div style="font-size:12px;color:var(--muted);margin-top:3px;">
+      Welcome back, <strong>{{ request.user.username }}</strong>
     </div>
   </div>
-  <div style="display:flex; gap:8px;">
+  <div style="display:flex;gap:8px;">
     <a href="{% url 'operations:receipt_create' %}" class="btn btn-primary">
       + New Receipt
     </a>
@@ -20,59 +21,160 @@
   </div>
 </div>
 
-<!-- KPI Cards -->
-<div class="kpi-grid">
-  <div class="kpi-card kpi-blue">
-    <div class="kpi-label">Total Products</div>
-    <div class="kpi-value">{{ total_products }}</div>
-    <div class="kpi-sub">active in system</div>
-  </div>
-  <div class="kpi-card kpi-warn">
-    <div class="kpi-label">Low Stock Items</div>
-    <div class="kpi-value">{{ low_stock_items }}</div>
-    <div class="kpi-sub">need reorder</div>
-  </div>
-  <div class="kpi-card kpi-danger">
-    <div class="kpi-label">Out of Stock</div>
-    <div class="kpi-value">{{ out_of_stock }}</div>
-    <div class="kpi-sub">immediate action needed</div>
-  </div>
-  <div class="kpi-card kpi-green">
-    <div class="kpi-label">Pending Receipts</div>
-    <div class="kpi-value">{{ pending_receipts }}</div>
-    <div class="kpi-sub">awaiting validation</div>
-  </div>
-  <div class="kpi-card kpi-blue">
-    <div class="kpi-label">Pending Deliveries</div>
-    <div class="kpi-value">{{ pending_deliveries }}</div>
-    <div class="kpi-sub">awaiting dispatch</div>
-  </div>
-</div>
-
-<!-- Low stock alert banner -->
+<!-- Alert Banner -->
 {% if low_stock_items %}
 <div class="alert alert-warning" style="margin-bottom:20px;">
   <span>⚠</span>
   <span>
-    <strong>{{ low_stock_items }} product{{ low_stock_items|pluralize }}</strong>
-    are running low on stock.
+    <strong>{{ low_stock_items }}
+    product{{ low_stock_items|pluralize }}</strong>
+    running low on stock.
     <a href="{% url 'products:list' %}?filter=low_stock"
-       style="color:inherit; font-weight:500; margin-left:6px;">
+       style="color:inherit;font-weight:500;margin-left:6px;">
       View products →
     </a>
   </span>
 </div>
 {% endif %}
 
-<!-- Recent Operations -->
-<div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+<!-- Row 1: KPI Cards -->
+<div class="kpi-grid" style="grid-template-columns:repeat(4,minmax(0,1fr));
+     margin-bottom:20px;">
+
+  <div class="kpi-card kpi-blue">
+    <div class="kpi-label">Total Products</div>
+    <div class="kpi-value">{{ total_products }}</div>
+    <div class="kpi-sub">active in system</div>
+  </div>
+
+  <div class="kpi-card kpi-blue">
+    <div class="kpi-label">Inventory Value</div>
+    <div class="kpi-value" style="font-size:20px;">
+      ₹{{ stock_value|floatformat:0 }}
+    </div>
+    <div class="kpi-sub">cost price × stock</div>
+  </div>
+
+  <div class="kpi-card kpi-warn">
+    <div class="kpi-label">Low Stock</div>
+    <div class="kpi-value">{{ low_stock_items }}</div>
+    <div class="kpi-sub">need reorder</div>
+  </div>
+
+  <div class="kpi-card kpi-danger">
+    <div class="kpi-label">Out of Stock</div>
+    <div class="kpi-value">{{ out_of_stock }}</div>
+    <div class="kpi-sub">immediate action</div>
+  </div>
+
+</div>
+
+<!-- Row 2: Operations Summary -->
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;
+            gap:12px;margin-bottom:20px;">
+
+  <!-- Receipts summary -->
+  <div class="table-card" style="padding:16px 20px;">
+    <div style="display:flex;align-items:center;
+                justify-content:space-between;margin-bottom:12px;">
+      <div style="font-size:13px;font-weight:500;">Receipts</div>
+      <a href="{% url 'operations:receipt_list' %}"
+         style="font-size:11px;color:var(--primary);text-decoration:none;">
+        View all
+      </a>
+    </div>
+    <div style="display:flex;gap:16px;">
+      <div style="text-align:center;">
+        <div style="font-size:22px;font-weight:500;color:var(--text);">
+          {{ total_receipts }}
+        </div>
+        <div style="font-size:11px;color:var(--muted);">Total</div>
+      </div>
+      <div style="width:0.5px;background:var(--border);"></div>
+      <div style="text-align:center;">
+        <div style="font-size:22px;font-weight:500;color:var(--success);">
+          {{ completed_receipts }}
+        </div>
+        <div style="font-size:11px;color:var(--muted);">Done</div>
+      </div>
+      <div style="width:0.5px;background:var(--border);"></div>
+      <div style="text-align:center;">
+        <div style="font-size:22px;font-weight:500;color:var(--warning);">
+          {{ pending_receipts }}
+        </div>
+        <div style="font-size:11px;color:var(--muted);">Pending</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Deliveries summary -->
+  <div class="table-card" style="padding:16px 20px;">
+    <div style="display:flex;align-items:center;
+                justify-content:space-between;margin-bottom:12px;">
+      <div style="font-size:13px;font-weight:500;">Deliveries</div>
+      <a href="{% url 'operations:delivery_list' %}"
+         style="font-size:11px;color:var(--primary);text-decoration:none;">
+        View all
+      </a>
+    </div>
+    <div style="display:flex;gap:16px;">
+      <div style="text-align:center;">
+        <div style="font-size:22px;font-weight:500;color:var(--text);">
+          {{ total_deliveries }}
+        </div>
+        <div style="font-size:11px;color:var(--muted);">Total</div>
+      </div>
+      <div style="width:0.5px;background:var(--border);"></div>
+      <div style="text-align:center;">
+        <div style="font-size:22px;font-weight:500;color:var(--success);">
+          {{ completed_deliveries }}
+        </div>
+        <div style="font-size:11px;color:var(--muted);">Done</div>
+      </div>
+      <div style="width:0.5px;background:var(--border);"></div>
+      <div style="text-align:center;">
+        <div style="font-size:22px;font-weight:500;color:var(--warning);">
+          {{ pending_deliveries }}
+        </div>
+        <div style="font-size:11px;color:var(--muted);">Pending</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Today's movements -->
+  <div class="table-card" style="padding:16px 20px;">
+    <div style="display:flex;align-items:center;
+                justify-content:space-between;margin-bottom:12px;">
+      <div style="font-size:13px;font-weight:500;">Today's Activity</div>
+      <a href="{% url 'ledger:history' %}"
+         style="font-size:11px;color:var(--primary);text-decoration:none;">
+        View ledger
+      </a>
+    </div>
+    <div style="display:flex;gap:16px;align-items:center;">
+      <div style="text-align:center;">
+        <div style="font-size:32px;font-weight:500;color:var(--primary);">
+          {{ today_movements }}
+        </div>
+        <div style="font-size:11px;color:var(--muted);">
+          stock movement{{ today_movements|pluralize }} today
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Row 3: Recent Operations + Low Stock -->
+<div style="display:grid;grid-template-columns:1fr 1fr;
+            gap:16px;margin-bottom:20px;">
 
   <!-- Recent Receipts -->
   <div class="table-card">
     <div class="table-card-header">
       <span>Recent Receipts</span>
       <a href="{% url 'operations:receipt_list' %}"
-         style="font-size:12px; color:var(--primary); text-decoration:none;">
+         style="font-size:12px;color:var(--primary);text-decoration:none;">
         View all
       </a>
     </div>
@@ -90,11 +192,11 @@
           <td>
             <a href="{% url 'operations:receipt_detail' receipt.pk %}"
                class="ref-code"
-               style="color:var(--primary); text-decoration:none;">
+               style="color:var(--primary);text-decoration:none;">
               {{ receipt.reference }}
             </a>
           </td>
-          <td style="color:var(--muted); font-size:12px;">
+          <td style="color:var(--muted);font-size:12px;">
             {{ receipt.supplier|default:"—" }}
           </td>
           <td>
@@ -106,8 +208,10 @@
         {% empty %}
         <tr>
           <td colspan="3"
-              style="text-align:center; color:var(--muted); padding:20px;">
-            No receipts yet
+              style="text-align:center;color:var(--muted);padding:24px;">
+            No receipts yet —
+            <a href="{% url 'operations:receipt_create' %}"
+               style="color:var(--primary);">Create one →</a>
           </td>
         </tr>
         {% endfor %}
@@ -120,7 +224,7 @@
     <div class="table-card-header">
       <span>Recent Deliveries</span>
       <a href="{% url 'operations:delivery_list' %}"
-         style="font-size:12px; color:var(--primary); text-decoration:none;">
+         style="font-size:12px;color:var(--primary);text-decoration:none;">
         View all
       </a>
     </div>
@@ -138,11 +242,11 @@
           <td>
             <a href="{% url 'operations:delivery_detail' delivery.pk %}"
                class="ref-code"
-               style="color:var(--primary); text-decoration:none;">
+               style="color:var(--primary);text-decoration:none;">
               {{ delivery.reference }}
             </a>
           </td>
-          <td style="color:var(--muted); font-size:12px;">
+          <td style="color:var(--muted);font-size:12px;">
             {{ delivery.delivery_address|default:"—"|truncatechars:20 }}
           </td>
           <td>
@@ -154,8 +258,10 @@
         {% empty %}
         <tr>
           <td colspan="3"
-              style="text-align:center; color:var(--muted); padding:20px;">
-            No deliveries yet
+              style="text-align:center;color:var(--muted);padding:24px;">
+            No deliveries yet —
+            <a href="{% url 'operations:delivery_create' %}"
+               style="color:var(--primary);">Create one →</a>
           </td>
         </tr>
         {% endfor %}
@@ -164,5 +270,61 @@
   </div>
 
 </div>
+
+<!-- Row 4: Low Stock Alert Table -->
+{% if low_stock_products %}
+<div class="table-card">
+  <div class="table-card-header">
+    <span style="color:var(--warning);">⚠ Products Needing Attention</span>
+    <a href="{% url 'products:list' %}?filter=low_stock"
+       style="font-size:12px;color:var(--primary);text-decoration:none;">
+      View all
+    </a>
+  </div>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>SKU</th>
+        <th>Category</th>
+        <th>On Hand</th>
+        <th>Reorder Level</th>
+        <th>Status</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for product in low_stock_products %}
+      <tr>
+        <td style="font-weight:500;">{{ product.name }}</td>
+        <td class="ref-code">{{ product.sku }}</td>
+        <td style="color:var(--muted);font-size:12px;">
+          {{ product.category.name|default:"—" }}
+        </td>
+        <td style="font-weight:500;
+          {% if product.is_out_of_stock %}color:var(--danger);
+          {% else %}color:var(--warning);{% endif %}">
+          {{ product.current_stock }}
+        </td>
+        <td style="color:var(--muted);">{{ product.reorder_level }}</td>
+        <td>
+          {% if product.is_out_of_stock %}
+            <span class="badge badge-cancel">Out of Stock</span>
+          {% else %}
+            <span class="badge badge-waiting">Low Stock</span>
+          {% endif %}
+        </td>
+        <td>
+          <a href="{% url 'operations:receipt_create' %}"
+             class="btn btn-sm btn-primary">
+            Reorder
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
 
 {% endblock %}

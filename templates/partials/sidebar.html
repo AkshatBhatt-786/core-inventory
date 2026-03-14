@@ -1,7 +1,6 @@
 {% load static %}
 
 <aside class="sidebar">
-
   <!-- Logo -->
   <div class="sidebar-logo">
     <div class="sidebar-logo-text">CoreInventory</div>
@@ -10,100 +9,223 @@
 
   <!-- Main Nav -->
   <nav class="sidebar-nav">
-
     <div class="nav-section-label">Main</div>
 
-    <a href="{% url 'dashboard:index' %}"
-       class="nav-item {% if request.resolver_match.app_name == 'dashboard' %}active{% endif %}">
+    <a
+      href="{% url 'dashboard:index' %}"
+      class="nav-item {% if request.resolver_match.app_name == 'dashboard' %}active{% endif %}"
+    >
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
-        <rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity="0.9"/>
-        <rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity="0.5"/>
-        <rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity="0.5"/>
-        <rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity="0.5"/>
+        <rect
+          x="1"
+          y="1"
+          width="6"
+          height="6"
+          rx="1.5"
+          fill="currentColor"
+          opacity="0.9"
+        />
+        <rect
+          x="9"
+          y="1"
+          width="6"
+          height="6"
+          rx="1.5"
+          fill="currentColor"
+          opacity="0.5"
+        />
+        <rect
+          x="1"
+          y="9"
+          width="6"
+          height="6"
+          rx="1.5"
+          fill="currentColor"
+          opacity="0.5"
+        />
+        <rect
+          x="9"
+          y="9"
+          width="6"
+          height="6"
+          rx="1.5"
+          fill="currentColor"
+          opacity="0.5"
+        />
       </svg>
       Dashboard
     </a>
 
-    <a href="{% url 'products:list' %}"
-       class="nav-item {% if request.resolver_match.app_name == 'products' %}active{% endif %}">
+    <a
+      href="{% url 'products:list' %}"
+      class="nav-item {% if request.resolver_match.url_name == 'list' and request.resolver_match.app_name == 'products' %}active{% endif %}"
+    >
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
-        <rect x="2" y="3" width="12" height="10" rx="2" stroke="currentColor" stroke-width="1.2"/>
-        <path d="M5 6h6M5 9h4" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+        <rect
+          x="2"
+          y="3"
+          width="12"
+          height="10"
+          rx="2"
+          stroke="currentColor"
+          stroke-width="1.2"
+        />
+        <path
+          d="M5 6h6M5 9h4"
+          stroke="currentColor"
+          stroke-width="1"
+          stroke-linecap="round"
+        />
       </svg>
       Products
     </a>
 
+    <a
+      href="{% url 'products:category_list' %}"
+      class="nav-item {% if request.resolver_match.url_name == 'category_list' %}active{% endif %}"
+    >
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+        <path
+          d="M2 4h12M2 8h8M2 12h5"
+          stroke="currentColor"
+          stroke-width="1.2"
+          stroke-linecap="round"
+        />
+      </svg>
+      Categories
+    </a>
+
+    <a
+      href="{% url 'products:warehouse_list' %}"
+      class="nav-item {% if request.resolver_match.url_name == 'warehouse_list' %}active{% endif %}"
+    >
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+        <path
+          d="M1 6l7-4 7 4v8H1V6z"
+          stroke="currentColor"
+          stroke-width="1.2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M6 14V9h4v5"
+          stroke="currentColor"
+          stroke-width="1.2"
+          stroke-linecap="round"
+        />
+      </svg>
+      Warehouses
+    </a>
+
     <div class="nav-section-label">Operations</div>
 
-    <a href="{% url 'operations:receipt_list' %}"
-       class="nav-item {% if request.resolver_match.url_name == 'receipt_list' %}active{% endif %}">
+    <a
+      href="{% url 'operations:receipt_list' %}"
+      class="nav-item {% if request.resolver_match.url_name == 'receipt_list' %}active{% endif %}"
+    >
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
-        <path d="M2 8h10M8 4l4 4-4 4" stroke="currentColor" stroke-width="1.2"
-              stroke-linecap="round" stroke-linejoin="round"/>
+        <path
+          d="M2 8h10M8 4l4 4-4 4"
+          stroke="currentColor"
+          stroke-width="1.2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
       </svg>
-      Receipts
-      {% if pending_receipts %}
-        <span class="nav-badge">{{ pending_receipts }}</span>
+      Receipts {% if pending_receipts %}
+      <span class="nav-badge">{{ pending_receipts }}</span>
       {% endif %}
     </a>
 
-    <a href="{% url 'operations:delivery_list' %}"
-       class="nav-item {% if request.resolver_match.url_name == 'delivery_list' %}active{% endif %}">
+    <a
+      href="{% url 'operations:delivery_list' %}"
+      class="nav-item {% if request.resolver_match.url_name == 'delivery_list' %}active{% endif %}"
+    >
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
-        <path d="M14 8H4M8 4L4 8l4 4" stroke="currentColor" stroke-width="1.2"
-              stroke-linecap="round" stroke-linejoin="round"/>
+        <path
+          d="M14 8H4M8 4L4 8l4 4"
+          stroke="currentColor"
+          stroke-width="1.2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
       </svg>
-      Deliveries
-      {% if pending_deliveries %}
-        <span class="nav-badge">{{ pending_deliveries }}</span>
+      Deliveries {% if pending_deliveries %}
+      <span class="nav-badge">{{ pending_deliveries }}</span>
       {% endif %}
     </a>
 
-    <a href="{% url 'operations:adjustment_list' %}"
-       class="nav-item {% if request.resolver_match.url_name == 'adjustment_list' %}active{% endif %}">
+    <a
+      href="{% url 'operations:adjustment_list' %}"
+      class="nav-item {% if request.resolver_match.url_name == 'adjustment_list' %}active{% endif %}"
+    >
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
-        <path d="M3 8h10M8 3v10" stroke="currentColor"
-              stroke-width="1.2" stroke-linecap="round"/>
+        <path
+          d="M3 8h10M8 3v10"
+          stroke="currentColor"
+          stroke-width="1.2"
+          stroke-linecap="round"
+        />
       </svg>
       Adjustments
     </a>
 
     <div class="nav-section-label">History</div>
 
-    <a href="{% url 'ledger:history' %}"
-       class="nav-item {% if request.resolver_match.app_name == 'ledger' %}active{% endif %}">
+    <a
+      href="{% url 'ledger:history' %}"
+      class="nav-item {% if request.resolver_match.app_name == 'ledger' %}active{% endif %}"
+    >
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
-        <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.2"/>
-        <path d="M8 5v3.5l2 1.5" stroke="currentColor"
-              stroke-width="1.1" stroke-linecap="round"/>
+        <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.2" />
+        <path
+          d="M8 5v3.5l2 1.5"
+          stroke="currentColor"
+          stroke-width="1.1"
+          stroke-linecap="round"
+        />
       </svg>
       Move History
     </a>
-
   </nav>
 
   <!-- Bottom: Profile + Logout -->
   <div class="sidebar-bottom">
     <div class="sidebar-divider"></div>
 
-    <a href="{% url 'accounts:profile' %}"
-       class="nav-item {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+    <a
+      href="{% url 'accounts:profile' %}"
+      class="nav-item {% if request.resolver_match.url_name == 'profile' %}active{% endif %}"
+    >
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
-        <circle cx="8" cy="6" r="2.5" stroke="currentColor" stroke-width="1.2"/>
-        <path d="M3 13c0-2.76 2.24-5 5-5s5 2.24 5 5"
-              stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+        <circle
+          cx="8"
+          cy="6"
+          r="2.5"
+          stroke="currentColor"
+          stroke-width="1.2"
+        />
+        <path
+          d="M3 13c0-2.76 2.24-5 5-5s5 2.24 5 5"
+          stroke="currentColor"
+          stroke-width="1.2"
+          stroke-linecap="round"
+        />
       </svg>
       My Profile
     </a>
 
     <a href="{% url 'accounts:logout' %}" class="nav-item nav-item-logout">
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
-        <path d="M10 3h3v10h-3M7 10l3-2-3-2M1 8h8"
-              stroke="currentColor" stroke-width="1.2"
-              stroke-linecap="round" stroke-linejoin="round"/>
+        <path
+          d="M10 3h3v10h-3M7 10l3-2-3-2M1 8h8"
+          stroke="currentColor"
+          stroke-width="1.2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
       </svg>
       Logout
     </a>
   </div>
-
 </aside>
