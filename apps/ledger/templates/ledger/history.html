@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Move History — CoreInventory{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <div class="page-title">Move History</div>
+</div>
+
+<!-- Filter Bar -->
+<div style="display:flex; gap:10px; margin-bottom:16px;">
+  <form method="GET" style="display:flex; gap:10px; flex-wrap:wrap;">
+    <input
+      type="text"
+      name="q"
+      value="{{ request.GET.q }}"
+      placeholder="Search by reference or contact..."
+      class="form-input"
+      style="max-width:240px;"
+    />
+    <select name="move_type" class="form-input" style="max-width:160px;">
+      <option value="">All Types</option>
+      <option value="in"
+        {% if request.GET.move_type == 'in' %}selected{% endif %}>
+        Stock In
+      </option>
+      <option value="out"
+        {% if request.GET.move_type == 'out' %}selected{% endif %}>
+        Stock Out
+      </option>
+      <option value="adjustment"
+        {% if request.GET.move_type == 'adjustment' %}selected{% endif %}>
+        Adjustment
+      </option>
+    </select>
+    <button type="submit" class="btn">Filter</button>
+    {% if request.GET.q or request.GET.move_type %}
+      <a href="{% url 'ledger:history' %}" class="btn">Clear</a>
+    {% endif %}
+  </form>
+</div>
+
+<div class="table-card">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Reference</th>
+        <th>Contact</th>
+        <th>Product</th>
+        <th>From</th>
+        <th>To</th>
+        <th>Quantity</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for entry in entries %}
+      <tr>
+        <td style="font-size:12px; color:var(--muted); white-space:nowrap;">
+          {{ entry.created_at|date:"d M Y" }}
+        </td>
+        <td class="ref-code">{{ entry.reference }}</td>
+        <td style="font-size:12px; color:var(--muted);">
+          {{ entry.contact|default:"—" }}
+        </td>
+        <td style="font-weight:500;">{{ entry.product.name }}</td>
+        <td style="font-size:12px; color:var(--muted);">
+          {{ entry.from_location|default:"vendor" }}
+        </td>
+        <td style="font-size:12px; color:var(--muted);">
+          {{ entry.to_location|default:"vendor" }}
+        </td>
+        <td style="font-weight:500;
+          {% if entry.move_type == 'in' %}color:var(--success);
+          {% elif entry.move_type == 'out' %}color:var(--danger);
+          {% else %}color:var(--muted);{% endif %}">
+          {% if entry.move_type == 'in' %}+{% elif entry.move_type == 'out' %}−{% endif %}
+          {{ entry.quantity }}
+        </td>
+        <td>
+          {% if entry.move_type == 'in' %}
+            <span class="badge badge-done">IN</span>
+          {% elif entry.move_type == 'out' %}
+            <span class="badge badge-cancel">OUT</span>
+          {% else %}
+            <span class="badge badge-waiting">
+              {{ entry.get_move_type_display }}
+            </span>
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="8"
+            style="text-align:center; color:var(--muted); padding:32px;">
+          No stock movements recorded yet.
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

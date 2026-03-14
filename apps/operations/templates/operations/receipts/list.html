@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}Receipts — CoreInventory{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <div class="page-title">Receipts</div>
+  <a href="{% url 'operations:receipt_create' %}" class="btn btn-primary">
+    + New Receipt
+  </a>
+</div>
+
+<!-- Filter Bar -->
+<div style="display:flex; gap:10px; margin-bottom:16px;">
+  <form method="GET" style="display:flex; gap:10px;">
+    <select name="status" class="form-input" style="max-width:160px;">
+      <option value="">All Status</option>
+      <option value="draft"
+        {% if request.GET.status == 'draft' %}selected{% endif %}>
+        Draft
+      </option>
+      <option value="ready"
+        {% if request.GET.status == 'ready' %}selected{% endif %}>
+        Ready
+      </option>
+      <option value="done"
+        {% if request.GET.status == 'done' %}selected{% endif %}>
+        Done
+      </option>
+      <option value="cancel"
+        {% if request.GET.status == 'cancel' %}selected{% endif %}>
+        Cancelled
+      </option>
+    </select>
+    <button type="submit" class="btn">Filter</button>
+    {% if request.GET.status %}
+      <a href="{% url 'operations:receipt_list' %}" class="btn">Clear</a>
+    {% endif %}
+  </form>
+</div>
+
+<div class="table-card">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Reference</th>
+        <th>Supplier</th>
+        <th>Schedule Date</th>
+        <th>Responsible</th>
+        <th>Status</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for receipt in receipts %}
+      <tr>
+        <td class="ref-code">{{ receipt.reference }}</td>
+        <td>{{ receipt.supplier|default:"—" }}</td>
+        <td style="font-size:12px; color:var(--muted);">
+          {{ receipt.schedule_date|date:"d M Y"|default:"—" }}
+        </td>
+        <td style="font-size:12px; color:var(--muted);">
+          {{ receipt.responsible.username|default:"—" }}
+        </td>
+        <td>
+          <span class="badge badge-{{ receipt.status }}">
+            {{ receipt.get_status_display }}
+          </span>
+        </td>
+        <td>
+          <a href="{% url 'operations:receipt_detail' receipt.pk %}"
+             class="btn btn-sm">
+            View
+          </a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="6"
+            style="text-align:center; color:var(--muted); padding:32px;">
+          No receipts found.
+          <a href="{% url 'operations:receipt_create' %}"
+             style="color:var(--primary);">
+            Create your first receipt →
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

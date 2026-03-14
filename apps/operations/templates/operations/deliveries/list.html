@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Deliveries — CoreInventory{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <div class="page-title">Deliveries</div>
+  <a href="{% url 'operations:delivery_create' %}" class="btn btn-primary">
+    + New Delivery
+  </a>
+</div>
+
+<div style="display:flex; gap:10px; margin-bottom:16px;">
+  <form method="GET" style="display:flex; gap:10px;">
+    <select name="status" class="form-input" style="max-width:160px;">
+      <option value="">All Status</option>
+      <option value="draft"
+        {% if request.GET.status == 'draft' %}selected{% endif %}>
+        Draft
+      </option>
+      <option value="waiting"
+        {% if request.GET.status == 'waiting' %}selected{% endif %}>
+        Waiting
+      </option>
+      <option value="ready"
+        {% if request.GET.status == 'ready' %}selected{% endif %}>
+        Ready
+      </option>
+      <option value="done"
+        {% if request.GET.status == 'done' %}selected{% endif %}>
+        Done
+      </option>
+    </select>
+    <button type="submit" class="btn">Filter</button>
+    {% if request.GET.status %}
+      <a href="{% url 'operations:delivery_list' %}" class="btn">Clear</a>
+    {% endif %}
+  </form>
+</div>
+
+<div class="table-card">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Reference</th>
+        <th>Delivery Address</th>
+        <th>Schedule Date</th>
+        <th>Responsible</th>
+        <th>Status</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for delivery in deliveries %}
+      <tr>
+        <td class="ref-code">{{ delivery.reference }}</td>
+        <td style="font-size:12px;">
+          {{ delivery.delivery_address|default:"—"|truncatechars:30 }}
+        </td>
+        <td style="font-size:12px; color:var(--muted);">
+          {{ delivery.schedule_date|date:"d M Y"|default:"—" }}
+        </td>
+        <td style="font-size:12px; color:var(--muted);">
+          {{ delivery.responsible.username|default:"—" }}
+        </td>
+        <td>
+          <span class="badge badge-{{ delivery.status }}">
+            {{ delivery.get_status_display }}
+          </span>
+        </td>
+        <td>
+          <a href="{% url 'operations:delivery_detail' delivery.pk %}"
+             class="btn btn-sm">
+            View
+          </a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="6"
+            style="text-align:center; color:var(--muted); padding:32px;">
+          No deliveries found.
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}
