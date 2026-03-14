@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}CoreInventory{% endblock %}</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/main.css' %}"/>
+</head>
+<body>
+
+{% if user.is_authenticated %}
+
+<div class="app-layout">
+
+  <!-- ── SIDEBAR ── -->
+  {% include "partials/sidebar.html" %}
+
+  <!-- ── MAIN AREA ── -->
+  <div class="main-area">
+
+    <!-- ── TOPBAR ── -->
+    {% include "partials/navbar.html" %}
+
+    <!-- ── ALERTS ── -->
+    {% include "partials/alerts.html" %}
+
+    <!-- ── PAGE CONTENT ── -->
+    <main class="page-content">
+      {% block content %}{% endblock %}
+    </main>
+
+  </div>
+
+</div>
+
+{% else %}
+
+<!-- Unauthenticated pages (login/signup) get plain layout -->
+{% block content %}{% endblock %}
+
+{% endif %}
+
+<script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>
