@@ -71,6 +71,8 @@ Built for the **Odoo x Indus Hackathon** by:
 |------|------|
 | Aksha Bhatt | Backend — Models, Views, Business Logic |
 | Maharshi Nimbark | Frontend — Templates, UI, Dashboard |
+| Ayoosh Khuman | Video Editing |
+| Neel Bhatt | Tester |
 
 ---
 
