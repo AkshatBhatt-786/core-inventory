@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block title %}{{ product.name }} — CoreInventory{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <div class="page-title">{{ product.name }}</div>
+    <div style="font-size:12px; color:var(--muted); margin-top:2px;">
+      <a href="{% url 'products:list' %}"
+         style="color:var(--muted); text-decoration:none;">
+        Products
+      </a> / {{ product.sku }}
+    </div>
+  </div>
+  <div style="display:flex; gap:8px;">
+    <a href="{% url 'products:edit' product.pk %}" class="btn">Edit</a>
+  </div>
+</div>
+
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+
+  <!-- Product Info -->
+  <div class="table-card" style="padding:20px;">
+    <div style="font-size:13px; font-weight:500;
+                margin-bottom:16px; color:var(--muted);">
+      Product Details
+    </div>
+    <table style="width:100%; font-size:13px; border-collapse:collapse;">
+      <tr>
+        <td style="padding:8px 0; color:var(--muted); width:140px;">SKU</td>
+        <td class="ref-code">{{ product.sku }}</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 0; color:var(--muted);">Category</td>
+        <td>{{ product.category.name|default:"—" }}</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 0; color:var(--muted);">Unit</td>
+        <td>{{ product.get_unit_of_measure_display }}</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 0; color:var(--muted);">Cost Price</td>
+        <td>₹{{ product.cost_price }}</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 0; color:var(--muted);">Warehouse</td>
+        <td>{{ product.warehouse|default:"—" }}</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 0; color:var(--muted);">Reorder Level</td>
+        <td>{{ product.reorder_level }}</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Stock Info -->
+  <div class="table-card" style="padding:20px;">
+    <div style="font-size:13px; font-weight:500;
+                margin-bottom:16px; color:var(--muted);">
+      Stock Status
+    </div>
+    <div style="text-align:center; padding:16px 0;">
+      <div style="font-size:48px; font-weight:500;
+        {% if product.is_out_of_stock %}color:var(--danger);
+        {% elif product.is_low_stock %}color:var(--warning);
+        {% else %}color:var(--success);{% endif %}">
+        {{ product.current_stock }}
+      </div>
+      <div style="font-size:13px; color:var(--muted); margin-top:4px;">
+        {{ product.get_unit_of_measure_display }} on hand
+      </div>
+      <div style="margin-top:12px;">
+        {% if product.is_out_of_stock %}
+          <span class="badge badge-cancel">Out of Stock</span>
+        {% elif product.is_low_stock %}
+          <span class="badge badge-waiting">Low Stock</span>
+        {% else %}
+          <span class="badge badge-done">In Stock</span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Stock Ledger for this product -->
+<div class="table-card" style="margin-top:16px;">
+  <div class="table-card-header">
+    <span>Stock Movement History</span>
+  </div>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Reference</th>
+        <th>Type</th>
+        <th>Quantity</th>
+        <th>Stock Before</th>
+        <th>Stock After</th>
+        <th>By</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for entry in ledger_entries %}
+      <tr>
+        <td style="font-size:12px; color:var(--muted);">
+          {{ entry.created_at|date:"d M Y" }}
+        </td>
+        <td class="ref-code">{{ entry.reference }}</td>
+        <td>
+          {% if entry.move_type == 'in' %}
+            <span style="color:var(--success); font-size:12px;">▲ IN</span>
+          {% elif entry.move_type == 'out' %}
+            <span style="color:var(--danger); font-size:12px;">▼ OUT</span>
+          {% else %}
+            <span style="color:var(--muted); font-size:12px;">
+              {{ entry.get_move_type_display }}
+            </span>
+          {% endif %}
+        </td>
+        <td style="font-weight:500;
+          {% if entry.move_type == 'in' %}color:var(--success);
+          {% else %}color:var(--danger);{% endif %}">
+          {% if entry.move_type == 'in' %}+{% else %}−{% endif %}
+          {{ entry.quantity }}
+        </td>
+        <td style="color:var(--muted);">{{ entry.stock_before }}</td>
+        <td style="font-weight:500;">{{ entry.stock_after }}</td>
+        <td style="color:var(--muted); font-size:12px;">
+          {{ entry.performed_by.username|default:"—" }}
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="7"
+            style="text-align:center; color:var(--muted); padding:24px;">
+          No movements yet
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}
