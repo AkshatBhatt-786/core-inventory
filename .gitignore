@@ -3,6 +3,23 @@ __pycache__/
 *.py[codz]
 *$py.class
 
+# Virtual environment
+venv/
+env/
+
+# Django
+*.sqlite3
+*.log
+local_settings.py
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
 # C extensions
 *.so
 
